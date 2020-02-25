@@ -14,7 +14,7 @@ const { exec } = require('child_process');
 const { createClient } = require('grpc-kit');
 const grpc = require('grpc');
 const common = require('./test_common');
-const proto_consts = require('./proto_consts');
+const mayastor_proto = require('./mayastor_proto');
 // just some UUID used for nexus ID
 const UUID = 'dbe4d7eb-118a-4d15-b789-a18d9af6ff21';
 const UUID2 = 'dbe4d7eb-118a-4d15-b789-a18d9af6ff22';
@@ -25,6 +25,8 @@ const aioFile = '/tmp/aio-backend';
 const diskSize = 64 * 1024 * 1024;
 // external IP address detected by common lib
 const externIp = common.getMyIp();
+
+var mayastor_proto_constants = mayastor_proto.get_constants()
 
 // Instead of using mayastor grpc methods to create replicas we use a config
 // file to create them. Advantage is that we don't depend on bugs in replica
@@ -346,7 +348,7 @@ describe('nexus', function() {
 
   it('should publish the nexus using nbd', done => {
     // TODO: repeat this test for iSCSI and Nvmf
-    client.PublishNexus({ uuid: UUID, share: proto_consts.ShareProtocol.NBD }, (err, res) => {
+    client.PublishNexus({ uuid: UUID, share: mayastor_proto_constants.ShareProtocol.NBD }, (err, res) => {
       assert(res.device_path);
       nbd_device = res.device_path;
       done();
@@ -362,7 +364,7 @@ describe('nexus', function() {
 
   it('should re-publish the nexus using NBD, and a crypto key', done => {
     // TODO: repeat this test for iSCSI and Nvmf
-    client.PublishNexus({ uuid: UUID, share: proto_consts.ShareProtocol.NBD, key: '0123456789123456' }, (err, res) => {
+    client.PublishNexus({ uuid: UUID, share: mayastor_proto_constants.ShareProtocol.NBD, key: '0123456789123456' }, (err, res) => {
       assert(res.device_path);
       nbd_device = res.device_path;
       done();
@@ -447,7 +449,7 @@ describe('nexus', function() {
     for (let i = 0; i < 10; i++) {
       await createNexus(createArgs);
       // TODO: repeat this test for iSCSI and Nvmf
-      await publish({ uuid: UUID, share: proto_consts.ShareProtocol.NBD });
+      await publish({ uuid: UUID, share: mayastor_proto_constants.ShareProtocol.NBD });
       await unpublish({ uuid: UUID });
       await destroyNexus({ uuid: UUID });
     }
@@ -465,7 +467,7 @@ describe('nexus', function() {
     for (let i = 0; i < 10; i++) {
       await createNexus(createArgs);
       // TODO: repeat this test for iSCSI and Nvmf
-      await publish({ uuid: UUID, share: proto_consts.ShareProtocol.NBD });
+      await publish({ uuid: UUID, share: mayastor_proto_constants.ShareProtocol.NBD });
       await destroyNexus({ uuid: UUID });
     }
   });
