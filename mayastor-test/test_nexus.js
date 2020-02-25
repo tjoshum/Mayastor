@@ -25,8 +25,7 @@ const aioFile = '/tmp/aio-backend';
 const diskSize = 64 * 1024 * 1024;
 // external IP address detected by common lib
 const externIp = common.getMyIp();
-
-var mayastor_proto_constants = mayastor_proto.get_constants()
+const mayastor_proto_constants = mayastor_proto.get_constants();
 
 // Instead of using mayastor grpc methods to create replicas we use a config
 // file to create them. Advantage is that we don't depend on bugs in replica

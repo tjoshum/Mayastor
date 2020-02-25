@@ -28,10 +28,10 @@ const mayastor_proto = require('./mayastor_proto');
 // Without requiring wtf module the ts hangs at the end. It seems that it is
 // waiting for sudo'd mayastor progress which has already exited!?
 const wtfnode = require('wtfnode');
+const mayastor_proto_constants = mayastor_proto.get_constants();
 
 var csiSock = common.CSI_ENDPOINT;
 var endpoint = common.endpoint;
-var mayastor_proto_constants = mayastor_proto.get_constants()
 
 // One big malloc bdev which we put lvol store on.
 const CONFIG = `
