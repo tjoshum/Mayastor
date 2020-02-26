@@ -6,7 +6,7 @@ const protoLoader = require('@grpc/proto-loader');
 // possible only with grpc-uds.
 const grpc = require('grpc-uds');
 
-function get_constants() {
+function getConstants() {
   const pkgDef = grpc.loadPackageDefinition(
     protoLoader.loadSync(
       path.join(__dirname, '..', 'rpc', 'proto', 'mayastor.proto'),
@@ -35,6 +35,6 @@ function get_constants() {
 }
 
 module.exports = {
-    get_constants,
+    getConstants,
 };
 
