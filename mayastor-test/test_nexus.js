@@ -411,6 +411,21 @@ describe('nexus', function() {
 // }
 
 // ISCSI {
+  it('should create a nexus with ISCSI frontend, using all types of replicas', done => {
+    let args = {
+      uuid: UUID_ISCSI,
+      size: diskSize,
+      children: [
+        'bdev:///Malloc0',
+        `aio:///${aioFile}?blk_size=4096`,
+        `iscsi://${externIp}:3261/iqn.2019-05.io.openebs:disk1`,
+        `nvmf://127.0.0.1:8420/nqn.2019-05.io.openebs:disk2`,
+      ],
+    };
+
+    client.CreateNexus(args, done);
+  });
+
   it('should publish the nexus using ISCSI', done => {
     // TODO: repeat this test for iSCSI and Nvmf
     client.PublishNexus({ uuid: UUID_ISCSI, share: mayastorProtoConstants.ShareProtocol.ISCSI }, (err, res) => {
@@ -472,6 +487,21 @@ describe('nexus', function() {
 // }
 
 // NVMF {
+  it('should create a nexus with NVMF frontend using all types of replicas', done => {
+    let args = {
+      uuid: UUID_NVMF,
+      size: diskSize,
+      children: [
+        'bdev:///Malloc0',
+        `aio:///${aioFile}?blk_size=4096`,
+        `iscsi://${externIp}:3261/iqn.2019-05.io.openebs:disk1`,
+        `nvmf://127.0.0.1:8420/nqn.2019-05.io.openebs:disk2`,
+      ],
+    };
+
+    client.CreateNexus(args, done);
+  });
+
   it('should publish the nexus using NVMF', done => {
     // TODO: repeat this test for iSCSI and Nvmf
     client.PublishNexus({ uuid: UUID_NVMF, share: mayastorProtoConstants.ShareProtocol.NVMF }, (err, res) => {
