@@ -16,7 +16,6 @@ use rpc::service::mayastor_client::MayastorClient;
 
 fn parse_share_protocol(pcol: Option<&str>) -> Result<i32, Status> {
     match pcol {
-        Some("nbd") => Ok(rpc::mayastor::ShareProtocol::Nbd as i32),
         Some("nvmf") => Ok(rpc::mayastor::ShareProtocol::Nvmf as i32),
         Some("iscsi") => Ok(rpc::mayastor::ShareProtocol::Iscsi as i32),
         Some(_) | None => Err(Status::new(
