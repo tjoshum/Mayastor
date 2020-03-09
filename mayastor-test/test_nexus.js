@@ -48,7 +48,7 @@ const configNexus = `
   ImmediateData Yes
   ErrorRecoveryLevel 0
   # Reduce mem requirements for iSCSI
-  MaxSessions 1
+  MaxSessions 2
   MaxConnectionsPerSession 1
 
 [PortalGroup1]
@@ -127,6 +127,7 @@ function createGrpcClient(service) {
 describe('nexus', function() {
   var client;
   var nbd_device;
+  var iscsi_iqn;
 
   const unpublish = args => {
     return new Promise((resolve, reject) => {
@@ -369,6 +370,33 @@ describe('nexus', function() {
           assert.equal(err.code, grpc.status.INVALID_ARGUMENT);
           done();
       });
+  });
+
+  it('should publish the nexus using iscsi', done => {
+    client.PublishNexus({ uuid: UUID, share: mayastorProtoConstants.ShareProtocol.ISCSI }, (err, res) => {
+      assert(res.device_path);
+      iscsi_iqn = res.device_path;
+      done();
+    });
+  });
+
+  it('should send io to the iscsi nexus device', done => {
+    let uri = `iscsi://${externIp}:3260/` + iscsi_iqn + '/0';
+    // runs the perf test for 1 second
+    exec('iscsi-perf -t 1 ' + uri, (err, stdout, stderr) => {
+      if (err) {
+        done(stderr);
+      } else {
+        done();
+      }
+    });
+  });
+
+  it('should un-publish the iscsi nexus device', done => {
+    client.unpublishNexus({ uuid: UUID }, (err, res) => {
+      if (err) done(err);
+      done();
+    });
   });
 
   it('should publish the nexus using nbd', done => {
