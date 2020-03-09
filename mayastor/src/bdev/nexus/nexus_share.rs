@@ -36,15 +36,13 @@ impl Nexus {
         share_proto: ShareProtocol,
         key: Option<String>,
     ) -> Result<String, Error> {
-        if self.nbd_disk.is_some() {
+        if self.share_protocol.is_some() {
             return Err(Error::AlreadyShared {
                 name: self.name.clone(),
             });
         }
 
         assert_eq!(self.share_handle, None);
-
-        self.share_protocol = Some(share_proto);
 
         // TODO for now we discard and ignore share_proto
 
@@ -82,6 +80,7 @@ impl Nexus {
             name: self.name.clone(),
         })?;
         let device_path = disk.get_path();
+        self.share_protocol = Some(share_proto);
         self.share_handle = Some(name);
         self.nbd_disk = Some(disk);
         Ok(device_path)
