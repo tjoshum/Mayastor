@@ -44,8 +44,6 @@ impl Nexus {
 
         assert_eq!(self.share_handle, None);
 
-        // TODO for now we discard and ignore share_proto
-
         let name = if let Some(key) = key {
             let name = format!("crypto-{}", self.name);
 
