@@ -36,7 +36,7 @@ use spdk_sys::{
 };
 
 use crate::{
-    core::Bdev,
+    core::{Bdev, Side},
     ffihelper::{cb_arg, done_errno_cb, errno_result_from_i32, ErrnoResult},
     jsonrpc::{jsonrpc_register, Code, RpcErrorCode},
     pool::Pool,
@@ -286,7 +286,7 @@ impl Replica {
                 .await
                 .context(ShareNvmf {})?,
             ShareType::Iscsi => {
-                target::iscsi::share(&uuid, &bdev).context(ShareIscsi {})?
+                target::iscsi::share(&uuid, &bdev, Side::BackEnd).context(ShareIscsi {})?
             }
         }
         Ok(())

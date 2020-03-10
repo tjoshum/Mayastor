@@ -37,8 +37,9 @@ use crate::{
             nexus_channel::{DREvent, NexusChannel, NexusChannelInner},
             nexus_child::{ChildError, ChildState, NexusChild},
             nexus_io::{io_status, Bio},
+            nexus_iscsi::{NexusIscsiError, NexusIscsiTarget},
             nexus_label::LabelError,
-            nexus_nbd::{Disk, NbdError},
+            nexus_nbd::{NbdDisk, NbdError},
         },
     },
     core::{Bdev, DmaBuf, DmaError},
@@ -70,8 +71,10 @@ pub enum Error {
     AlreadyShared { name: String },
     #[snafu(display("The nexus {} has not been shared", name))]
     NotShared { name: String },
-    #[snafu(display("Failed to share nexus {}", name))]
-    ShareNexus { source: NbdError, name: String },
+    #[snafu(display("Failed to share NBD nexus {}", name))]
+    ShareNbdNexus { source: NbdError, name: String },
+    #[snafu(display("Failed to share iscsi nexus {}", name))]
+    ShareIscsiNexus { source: NexusIscsiError, name: String },
     #[snafu(display("Failed to allocate label of nexus {}", name))]
     AllocLabel { source: DmaError, name: String },
     #[snafu(display("Failed to write label of nexus {}", name))]
@@ -195,12 +198,14 @@ pub struct Nexus {
     /// the offset in num blocks where the data partition starts
     pub data_ent_offset: u64,
     /// nbd device which the nexus is exposed through
-    pub(crate) nbd_disk: Option<Disk>,
+    pub(crate) nbd_disk: Option<NbdDisk>,
     /// the handle to be used when sharing the nexus, this allows for the bdev
     /// to be shared with vbdevs on top
     pub(crate) share_handle: Option<String>,
     /// frontend share protocol used when the nexus is published
     pub share_protocol: Option<ShareProtocolNexus>,
+    /// iscsi target which the nexus is exposed through
+    pub(crate) iscsi_target: Option<NexusIscsiTarget>,
 }
 
 unsafe impl core::marker::Sync for Nexus {}
@@ -275,6 +280,7 @@ impl Nexus {
             dr_complete_notify: None,
             data_ent_offset: 0,
             nbd_disk: None,
+            iscsi_target: None,
             share_handle: None,
             size,
             share_protocol: None,
